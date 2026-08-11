@@ -1,10 +1,14 @@
-import React from 'react'
+import { Routes, Route } from 'react-router-dom'
+import Layout from './components/Layout'
+import Dashboard from './pages/Dashboard'
 
-const App = () => {
+function App() {
   return (
-    <div className='text-2xl bg-green-300 text-yellow-300'>
-      Mohamed Osman Ali
-    </div>
+    <Routes>
+      <Route element={<Layout />}>
+        <Route path="/" element={<Dashboard />} />
+      </Route>
+    </Routes>
   )
 }
 
