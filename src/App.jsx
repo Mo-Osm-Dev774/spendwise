@@ -5,6 +5,7 @@ import ProtectedRoute from './components/ProtectedRoute'
 import Dashboard from './pages/Dashboard'
 import Login from './pages/Login'
 import Register from './pages/Register'
+import Transactions from './pages/Transactions'
 
 function App() {
   return (
@@ -21,6 +22,7 @@ function App() {
           }
         >
           <Route path="/" element={<Dashboard />} />
+          <Route path="/transactions" element={<Transactions />} />
         </Route>
       </Routes>
     </AuthProvider>
