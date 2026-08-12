@@ -19,9 +19,22 @@ function Analytics() {
   const [transactions, setTransactions] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
+  const [isDark, setIsDark] = useState(
+    () => document.documentElement.classList.contains('dark')
+  )
 
   useEffect(() => {
     fetchTransactions()
+
+    // Watch for theme changes so charts update without a page reload
+    const observer = new MutationObserver(() => {
+      setIsDark(document.documentElement.classList.contains('dark'))
+    })
+    observer.observe(document.documentElement, {
+      attributes: true,
+      attributeFilter: ['class'],
+    })
+    return () => observer.disconnect()
   }, [])
 
   async function fetchTransactions() {
@@ -39,7 +52,6 @@ function Analytics() {
     setLoading(false)
   }
 
-  // Income vs Expenses totals
   const totalIncome = transactions
     .filter((t) => t.type === 'income')
     .reduce((sum, t) => sum + Number(t.amount), 0)
@@ -53,7 +65,6 @@ function Analytics() {
     { name: 'Expenses', amount: totalExpenses },
   ]
 
-  // Expenses by category
   const categoryTotals = {}
   transactions
     .filter((t) => t.type === 'expense')
@@ -66,7 +77,6 @@ function Analytics() {
     value,
   }))
 
-  // Monthly spending (current year)
   const currentYear = new Date().getFullYear()
   const monthlyTotals = Array(12).fill(0)
 
@@ -82,42 +92,57 @@ function Analytics() {
     amount: monthlyTotals[i],
   }))
 
+  // Colors that actually apply to Recharts SVG text/lines
+  const axisColor = isDark ? '#d1d5db' : '#4b5563' // gray-300 / gray-600
+  const gridColor = isDark ? '#374151' : '#e5e7eb' // gray-700 / gray-200
+  const legendColor = isDark ? '#e5e7eb' : '#374151'
+  const tooltipStyle = {
+    backgroundColor: isDark ? '#1f2937' : '#ffffff',
+    border: 'none',
+    borderRadius: 8,
+    color: isDark ? '#f3f4f6' : '#111827',
+  }
+
   return (
     <div className="p-6 max-w-4xl mx-auto">
-      <h1 className="text-2xl font-bold mb-6">Analytics</h1>
+      <h1 className="text-2xl font-bold mb-6 text-gray-800 dark:text-gray-100">
+        Analytics
+      </h1>
 
       {error && (
-        <p className="bg-red-50 text-red-600 text-sm rounded-lg p-3 mb-4">
+        <p className="bg-red-50 dark:bg-red-900/30 text-red-600 dark:text-red-400 text-sm rounded-lg p-3 mb-4">
           {error}
         </p>
       )}
 
       {loading ? (
-        <p className="text-gray-500">Loading analytics...</p>
+        <p className="text-gray-500 dark:text-gray-400">Loading analytics...</p>
       ) : transactions.length === 0 ? (
-        <p className="text-gray-500">
+        <p className="text-gray-500 dark:text-gray-400">
           No transactions yet. Add some transactions to see your analytics.
         </p>
       ) : (
         <div className="grid grid-cols-1 gap-6">
-          {/* Income vs Expenses */}
-          <div className="bg-white rounded-xl shadow p-4">
-            <h2 className="font-semibold text-gray-800 mb-4">Income vs Expenses</h2>
+          <div className="bg-white dark:bg-gray-800 rounded-xl shadow p-4">
+            <h2 className="font-semibold text-gray-800 dark:text-gray-100 mb-4">
+              Income vs Expenses
+            </h2>
             <ResponsiveContainer width="100%" height={250}>
               <BarChart data={incomeVsExpenseData}>
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="name" />
-                <YAxis />
-                <Tooltip />
+                <CartesianGrid strokeDasharray="3 3" stroke={gridColor} />
+                <XAxis dataKey="name" tick={{ fill: axisColor }} axisLine={{ stroke: gridColor }} />
+                <YAxis tick={{ fill: axisColor }} axisLine={{ stroke: gridColor }} />
+                <Tooltip contentStyle={tooltipStyle} />
                 <Bar dataKey="amount" fill="#6366f1" radius={[6, 6, 0, 0]} />
               </BarChart>
             </ResponsiveContainer>
           </div>
 
-          {/* Expenses by Category */}
           {categoryData.length > 0 && (
-            <div className="bg-white rounded-xl shadow p-4">
-              <h2 className="font-semibold text-gray-800 mb-4">Expenses by Category</h2>
+            <div className="bg-white dark:bg-gray-800 rounded-xl shadow p-4">
+              <h2 className="font-semibold text-gray-800 dark:text-gray-100 mb-4">
+                Expenses by Category
+              </h2>
               <ResponsiveContainer width="100%" height={280}>
                 <PieChart>
                   <Pie
@@ -127,7 +152,7 @@ function Analytics() {
                     cx="50%"
                     cy="50%"
                     outerRadius={90}
-                    label={(entry) => entry.name}
+                    label={{ fill: axisColor }}
                   >
                     {categoryData.map((_, index) => (
                       <Cell
@@ -136,24 +161,23 @@ function Analytics() {
                       />
                     ))}
                   </Pie>
-                  <Tooltip />
-                  <Legend />
+                  <Tooltip contentStyle={tooltipStyle} />
+                  <Legend wrapperStyle={{ color: legendColor }} />
                 </PieChart>
               </ResponsiveContainer>
             </div>
           )}
 
-          {/* Monthly Spending */}
-          <div className="bg-white rounded-xl shadow p-4">
-            <h2 className="font-semibold text-gray-800 mb-4">
+          <div className="bg-white dark:bg-gray-800 rounded-xl shadow p-4">
+            <h2 className="font-semibold text-gray-800 dark:text-gray-100 mb-4">
               Monthly Spending ({currentYear})
             </h2>
             <ResponsiveContainer width="100%" height={250}>
               <BarChart data={monthlyData}>
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="name" />
-                <YAxis />
-                <Tooltip />
+                <CartesianGrid strokeDasharray="3 3" stroke={gridColor} />
+                <XAxis dataKey="name" tick={{ fill: axisColor }} axisLine={{ stroke: gridColor }} />
+                <YAxis tick={{ fill: axisColor }} axisLine={{ stroke: gridColor }} />
+                <Tooltip contentStyle={tooltipStyle} />
                 <Bar dataKey="amount" fill="#ef4444" radius={[6, 6, 0, 0]} />
               </BarChart>
             </ResponsiveContainer>

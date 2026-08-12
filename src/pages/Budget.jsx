@@ -29,7 +29,6 @@ function Budget() {
     setLoading(true)
     setError('')
 
-    // Get this month's budget
     const { data: budgetData, error: budgetError } = await supabase
       .from('budgets')
       .select('*')
@@ -44,7 +43,6 @@ function Budget() {
       setAmountInput(budgetData.amount)
     }
 
-    // Sum this month's expenses
     const startDate = `${year}-${String(month).padStart(2, '0')}-01`
     const endMonth = month === 12 ? 1 : month + 1
     const endYear = month === 12 ? year + 1 : year
@@ -116,27 +114,26 @@ function Budget() {
 
   return (
     <div className="p-6 max-w-2xl mx-auto">
-      <h1 className="text-2xl font-bold mb-6">
+      <h1 className="text-2xl font-bold mb-6 text-gray-800 dark:text-gray-100">
         Budget — {MONTHS[month - 1]} {year}
       </h1>
 
       {error && (
-        <p className="bg-red-50 text-red-600 text-sm rounded-lg p-3 mb-4">
+        <p className="bg-red-50 dark:bg-red-900/30 text-red-600 dark:text-red-400 text-sm rounded-lg p-3 mb-4">
           {error}
         </p>
       )}
 
       {loading ? (
-        <p className="text-gray-500">Loading budget...</p>
+        <p className="text-gray-500 dark:text-gray-400">Loading budget...</p>
       ) : (
         <>
-          {/* Set / update budget form */}
           <form
             onSubmit={handleSave}
-            className="bg-white rounded-xl shadow p-4 mb-6 flex items-end gap-4"
+            className="bg-white dark:bg-gray-800 rounded-xl shadow p-4 mb-6 flex items-end gap-4"
           >
             <div className="flex-1">
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                 Monthly Budget
               </label>
               <input
@@ -144,7 +141,7 @@ function Budget() {
                 step="0.01"
                 value={amountInput}
                 onChange={(e) => setAmountInput(e.target.value)}
-                className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                className="w-full border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-100 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500"
                 placeholder="e.g. 500"
               />
             </div>
@@ -157,27 +154,28 @@ function Budget() {
             </button>
           </form>
 
-          {/* Budget overview */}
           {budget && (
-            <div className="bg-white rounded-xl shadow p-6">
+            <div className="bg-white dark:bg-gray-800 rounded-xl shadow p-6">
               <div className="grid grid-cols-3 gap-4 mb-4 text-center">
                 <div>
-                  <p className="text-sm text-gray-500">Budget</p>
-                  <p className="text-xl font-semibold text-gray-800">
+                  <p className="text-sm text-gray-500 dark:text-gray-400">Budget</p>
+                  <p className="text-xl font-semibold text-gray-800 dark:text-gray-100">
                     ${budgetAmount.toFixed(2)}
                   </p>
                 </div>
                 <div>
-                  <p className="text-sm text-gray-500">Spent</p>
-                  <p className="text-xl font-semibold text-red-600">
+                  <p className="text-sm text-gray-500 dark:text-gray-400">Spent</p>
+                  <p className="text-xl font-semibold text-red-600 dark:text-red-400">
                     ${spent.toFixed(2)}
                   </p>
                 </div>
                 <div>
-                  <p className="text-sm text-gray-500">Remaining</p>
+                  <p className="text-sm text-gray-500 dark:text-gray-400">Remaining</p>
                   <p
                     className={`text-xl font-semibold ${
-                      remaining < 0 ? 'text-red-600' : 'text-green-600'
+                      remaining < 0
+                        ? 'text-red-600 dark:text-red-400'
+                        : 'text-green-600 dark:text-green-400'
                     }`}
                   >
                     ${remaining.toFixed(2)}
@@ -185,8 +183,7 @@ function Budget() {
                 </div>
               </div>
 
-              {/* Progress bar */}
-              <div className="w-full bg-gray-200 rounded-full h-3 overflow-hidden">
+              <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-3 overflow-hidden">
                 <div
                   className={`h-3 rounded-full transition-all ${
                     isOverBudget
@@ -198,17 +195,17 @@ function Budget() {
                   style={{ width: `${percentUsed}%` }}
                 />
               </div>
-              <p className="text-sm text-gray-500 mt-2 text-center">
+              <p className="text-sm text-gray-500 dark:text-gray-400 mt-2 text-center">
                 {percentUsed.toFixed(0)}% used
               </p>
 
               {isOverBudget && (
-                <p className="bg-red-50 text-red-600 text-sm rounded-lg p-3 mt-4">
+                <p className="bg-red-50 dark:bg-red-900/30 text-red-600 dark:text-red-400 text-sm rounded-lg p-3 mt-4">
                   ⚠️ You've exceeded your budget for this month.
                 </p>
               )}
               {isNearLimit && !isOverBudget && (
-                <p className="bg-yellow-50 text-yellow-700 text-sm rounded-lg p-3 mt-4">
+                <p className="bg-yellow-50 dark:bg-yellow-900/30 text-yellow-700 dark:text-yellow-400 text-sm rounded-lg p-3 mt-4">
                   ⚠️ You're close to your budget limit for this month.
                 </p>
               )}
