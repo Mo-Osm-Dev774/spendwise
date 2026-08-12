@@ -4,6 +4,7 @@ const links = [
   { name: 'Dashboard', path: '/' },
   { name: 'Transactions', path: '/transactions' },
   { name: 'Budget', path: '/budget' },
+  { name: 'Analytics', path: '/analytics' },
 ]
 
 function Sidebar() {

@@ -7,6 +7,7 @@ import Login from './pages/Login'
 import Register from './pages/Register'
 import Transactions from './pages/Transactions'
 import Budget from './pages/Budget'
+import Analytics from './pages/Analytics'
 
 function App() {
   return (
@@ -25,6 +26,7 @@ function App() {
           <Route path="/" element={<Dashboard />} />
           <Route path="/transactions" element={<Transactions />} />
           <Route path="/budget" element={<Budget />} />
+          <Route path="/analytics" element={<Analytics />} />
         </Route>
       </Routes>
     </AuthProvider>
